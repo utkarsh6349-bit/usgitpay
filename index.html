@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Pay to Utkarsh</title>
+
+<style>
+
+/* ===== THEME ===== */
+
+:root{
+--bg:linear-gradient(135deg,#fdfbfb,#ebedee);
+--gold:#D4AF37;
+--dark:#1A1A1A;
+}
+
+/* ===== RESET ===== */
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial, sans-serif;
+}
+
+/* ===== BODY ===== */
+
+body{
+background:var(--bg);
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+/* ===== CARD ===== */
+
+.card{
+background:#fff;
+width:100%;
+max-width:380px;
+padding:32px 28px;
+border-radius:26px;
+text-align:center;
+box-shadow:0 12px 45px rgba(0,0,0,0.1);
+animation:fadeIn .5s ease;
+}
+
+@keyframes fadeIn{
+from{opacity:0;transform:translateY(20px);}
+to{opacity:1;transform:none;}
+}
+
+/* ===== PROFILE ===== */
+
+.avatar{
+width:72px;
+height:72px;
+border-radius:50%;
+background:#fafafa;
+margin:auto;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:30px;
+font-weight:bold;
+color:var(--gold);
+border:2px solid var(--gold);
+}
+
+h1{
+margin:12px 0 5px;
+font-size:23px;
+}
+
+.subtitle{
+color:#777;
+font-size:14px;
+}
+
+/* ===== INPUT ===== */
+
+.input-box{
+margin:28px 0;
+position:relative;
+}
+
+.input-box span{
+position:absolute;
+left:16px;
+top:50%;
+transform:translateY(-50%);
+font-size:26px;
+opacity:.8;
+}
+
+input{
+width:100%;
+padding:16px 20px 16px 48px;
+font-size:26px;
+border-radius:16px;
+border:2px solid #eee;
+text-align:center;
+transition:.2s;
+}
+
+input:focus{
+outline:none;
+border-color:var(--gold);
+box-shadow:0 0 0 3px rgba(212,175,55,.15);
+}
+
+/* ===== BUTTON ===== */
+
+button{
+width:100%;
+padding:15px;
+background:linear-gradient(135deg,#D4AF37,#C5A028);
+color:#fff;
+font-size:17px;
+border:none;
+border-radius:18px;
+cursor:pointer;
+transition:.2s;
+}
+
+button:hover{filter:brightness(1.05);}
+button:active{transform:scale(.97);}
+
+/* ===== MODAL ===== */
+
+.modal{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.45);
+display:none;
+align-items:flex-end;
+justify-content:center;
+backdrop-filter:blur(3px);
+}
+
+.modal.active{display:flex;}
+
+.sheet{
+background:#fff;
+width:100%;
+max-width:420px;
+border-radius:26px 26px 0 0;
+padding:26px 22px 32px;
+animation:slideUp .35s ease;
+}
+
+@keyframes slideUp{
+from{transform:translateY(100%);}
+to{transform:none;}
+}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:22px;
+}
+
+.close{
+background:#f2f2f2;
+border:none;
+width:38px;
+height:38px;
+border-radius:50%;
+font-size:22px;
+cursor:pointer;
+}
+
+/* ===== APPS ===== */
+
+.grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:14px;
+}
+
+.app{
+border:1px solid #eee;
+padding:14px;
+border-radius:16px;
+cursor:pointer;
+display:flex;
+align-items:center;
+gap:10px;
+font-weight:600;
+transition:.2s;
+}
+
+.app:hover{
+background:#fffdf4;
+border-color:var(--gold);
+}
+
+.app img{width:38px;}
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<div class="avatar">U</div>
+
+<h1>Paying Utkarsh</h1>
+<p class="subtitle">Fast & Secure UPI Payment</p>
+
+<div class="input-box">
+<span>₹</span>
+<input type="number" id="amount" placeholder="0.00" step="0.01" min="1" autofocus>
+</div>
+
+<button onclick="openModal()">Proceed to Pay</button>
+
+</div>
+
+
+<!-- ===== MODAL ===== -->
+
+<div class="modal" id="modal" onclick="outside(event)">
+
+<div class="sheet">
+
+<div class="header">
+<h3>Pay <span id="showAmt" style="color:#D4AF37"></span></h3>
+<button class="close" onclick="closeModal()">×</button>
+</div>
+
+<div class="grid">
+
+<div class="app" onclick="pay('gpay')">
+<img src="image.jpg">
+Google Pay
+</div>
+
+<div class="app" onclick="pay('phonepe')">
+<img src="image2.png">
+PhonePe
+</div>
+
+<div class="app" onclick="pay('paytm')">
+<img src="image3.jpg">
+Paytm
+</div>
+
+<div class="app" onclick="pay('upi')">
+    <img src="image4.png">
+<b>BHIM</b> Other UPI
+</div>
+
+</div>
+
+</div>
+</div>
+
+
+<script>
+
+/* ===== CONFIG (CHANGE THIS) ===== */
+
+const upi = "utkarsh6349@okicici";   // <-- Apna REAL UPI ID
+const name = "Utkarsh";
+const currency = "INR";
+
+/* ===== UI ===== */
+
+function openModal(){
+
+const amt = parseFloat(
+document.getElementById("amount").value
+);
+
+if(isNaN(amt) || amt < 1){
+alert("Please enter amount (Min ₹1)");
+return;
+}
+
+document.getElementById("showAmt").innerText =
+"₹"+amt.toFixed(2);
+
+document.getElementById("modal")
+.classList.add("active");
+}
+
+function closeModal(){
+document.getElementById("modal")
+.classList.remove("active");
+}
+
+function outside(e){
+if(e.target.id==="modal"){
+closeModal();
+}
+}
+
+/* ===== PAYMENT ===== */
+
+function pay(app){
+
+const amt = parseFloat(
+document.getElementById("amount").value
+).toFixed(2);
+
+/* Extra Safety Params */
+const txnId = "TXN"+Date.now();
+
+let params =
+"pa="+upi+
+"&pn="+encodeURIComponent(name)+
+"&am="+amt+
+"&cu="+currency+
+"&tr="+txnId+
+"&tn=WebsitePayment";
+
+let url="";
+
+switch(app){
+
+case "gpay":
+url="tez://upi/pay?"+params;
+break;
+
+case "phonepe":
+url="phonepe://pay?"+params;
+break;
+
+case "paytm":
+url="paytmmp://pay?"+params;
+break;
+
+default:
+url="upi://pay?"+params;
+}
+
+window.location.href = url;
+
+setTimeout(closeModal,1200);
+}
+
+</script>
+
+</body>
+</html>
